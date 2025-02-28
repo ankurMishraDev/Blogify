@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head.ejs') %>
+    <title>Add New Blogs</title>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+    <style>
+        body {
+          background-color: #212121;
+          font-family: 'Roboto', sans-serif;
+          color: white;
+        }
+        .container {
+          background-color: #424242;
+          padding: 20px;
+          border-radius: 10px;
+          max-width: 800px;
+          margin: auto;
+        }
+        h1 {
+          text-align: center;
+        }
+        .form-label {
+          color: white;
+        }
+        /* Responsive styles */
+        @media (max-width: 576px) {
+          .container {
+            padding: 10px;
+            width: 90%;
+          }
+        }
+        @media (min-width: 577px) and (max-width: 768px) {
+          .container {
+            padding: 15px;
+            width: 80%;
+          }
+        }
+        @media (min-width: 769px) {
+          .container {
+            padding: 20px;
+            width: 70%;
+          }
+        }
+        </style>
+    <div class="container mt-3" style="margin-left: 30%;width: 50%;">
+        <h1>Add New Blog</h1>
+        <form action="/blog/add-new" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="image" class="form-label">Upload Image</label>
+                <input type="file" class="form-control" id="coverImage" name="coverImage" required>
+            </div>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <textarea class="form-control" id="content" name="body" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+     <%- include('./partials/script.ejs') %>
+</body>
+</html>

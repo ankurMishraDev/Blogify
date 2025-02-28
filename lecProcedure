@@ -1,0 +1,119 @@
+Part-1
+Configure all the setup.
+
+Prepare mvc paradigm.
+
+Create a routes folder.
+
+In index file create path and express objects.
+
+Create express app and for temporarily use manual PORT system.
+
+Set view engine and render view path.
+
+Create home.ejs file in views and create its boilerplate.
+
+Create a folder within views named as partials, the partials folder will be used to store common components like <head></head> tag or script files details that will be similar for every page.
+
+Create head.ejs file in partial folder that store the header details of html rendering pages.
+
+Paste the bootstrap cdn link in head.ejs file and script file in scirpt.ejs.
+
+Render the components of partials file in home file using ejs commands "<%- include("./path")%>" for head and script file.
+
+Create a get route to render home.ejs page.
+
+Install mongoose dependency.
+
+define the schema creating and storing the blogs of app in models folder in user.js, start with requiring schema, model methods from mongoose package.
+
+user schema properties -> fullName(String, required), email(String, required, unique), salt(String, required), password(String, required), profileImageURL(String, use default image in case if user didn't provide it), role(String, enum:[user , admin], default:user)
+
+Create a user instantiate using model method and provide user schema as parameter.
+
+We will use salt and hashing technique to increase the password security so that it can't be tracked easily, use .pre method of schema that take operation and call back function as parameter.
+first parameter will be 'save' which shows the function will get triggger before user save the changes in its password, the second parameter will not be a anonymous function it will be a general function with next method as parameter.
+require "createHmac" and "randomBytes" methods from pre-defined "crypto" package.
+
+create a user object that denotes the current object using "this" keyword.
+create a salt using randomBytes method of your desired length in a string format, now create a hashed password from salt using createHmac provide parameters like format(sha256), salt then provide the variable that has to be updated like in our case is user password in .update method and then call .digest method with required format(hex). 
+change the current salt and password of object with the new derived ones.{this.salt = salt & this.password = hashedPassword} then call the next method.
+
+Create a router in user.js in routes folder  
+import User from models
+acquire router method from express
+make router using router() method
+create a get route for signin page and one for signup page 
+create a post route for signup page, call back function will async, instantiate userName, email and password from request body and then create user using await User.create({}) in return redirect user to home page.
+
+Intantiate userRoute object in index.js that control routes/user.js routes and makes it route for every "/user" call
+
+Create a signup page in the views folder that contain navbar same as home page, use a bootstrap component of form for three fields fullName, email, password. Also make changes in the predefined name of these components provide them their name, id, class attributes as their name.
+Make the form action to redirect at routes/user, method will be post as we taking data from user.
+ Create a post route for this signup page in the routes/user and in return render the signup page.
+
+Create mongodb connetion in index.js file, require mongoose and then use mongodb.connect()method to establish connetion.Also connect express.urlencoded middleware to handle form data.
+
+For temporarily use make the salt element of user model unrequired.
+
+Create a signin page in the views folder that contain navbar same as home page, in signin page we only required to handle email and password field of the user. Create a signin route in routes/user for post method, to provide signin facilty and verify the authenticity of user we use a specific virtual fuction provided by mongodb names as .static(), 
+Make changes in the user model where use schema.static() that takes parameters as function name to check the validation:"matchPassword" and callback function: function(req,res){}. In call back function we check for similar email entry in our entry using findOne() method by intantiating current user that wiil use the provided email and password if the email didn't matched with existing email records then throw an error "User not found", now for password 
+we take salt of current user and already hashedPassword registered with email using user.password. Again we use createHmac method from crypto to make hash of the password by the salt provided by the user, now will check the equality of both the hashed password and if they are not equal we will through an error as "Incorrect Password"
+and in return we provide user with undefined values for properties like password and salt "...user, password:undefined, salt:undefined".
+Now in signin route of routes/user take email and input password from req body and then we intantiate a user object using "User.matchPassword(email,password)" to validate the given email and password of user and in return we will redirect the user to homepage("/")
+
+Part-2
+Download JWT dependency. Create a services folder in the main path and make auth.js file in it.
+intantiate jwt package object, create a unique secret to key to access password, create a function that generate token for user and takes an object as parameter, inside of the function first we create a local object that has user's: _id, email, profileImageURL and role then we generate jwt token using JWT.sign() method that take local user object and secret key to generate unique token then we will return that token.
+Next we create a function that validate user token to check whether the user have a validate token or not the function takes a token as parameter, inside the function we create a local variable that takes value generate by JWT.verify() method which take given input token and secret as arguments and then return this local variable, export these functions.
+
+Now make changes in the model/user schema where we was validating the user in userSchema.static() method, so after the validation of user create a new token for the user and return it, use createUserToken function we created in auth.js in service folder, change the name of the method from "matchPassword" to "matchPasswordAndCreateToken". Similarily also make changes in the routes/user.js where change the flow of sign route and after validating the user creadentials generate token using "matchPasswordAndCreateToken" method and then return this token using cookie() method that act as a middleware in the res.redirect and takes a token as parameter. Now we know that "matchPasswordAndCreateToken" method will throw an error if user didn't provide the validate creadentials so in that case we have to handle this error so for that we use try and catch to prevent this where we put the validation of token in try block and in catch block we render the same signin page with an alert message show on the of the page. For show showing error on client side we use a general alert message on nav.ejs with an if condition of "locals.error" so that in case of any local error that alert will appear in the page, use bootstrap for design.
+
+Now we will work upon the behaviour of login button in case of signin or signout cases:
+-> We will check whether the user in signined or not by using middlewares
+-> The middleware will check for cookies in the network to find the user details, if the cookies are available then the login button will show the name of user otherwise it will just appear as login button.
+-> First create a middleware folder in root path then create a authentication.js file in it.
+-> In that file create a function "checkForAuthenticationCookie" that takes cookieName as parameter, inside the function it we just declare a return statement with anonymous function call where req,res and next will be the parameteres, inside this function we store the value of token cookie by using req.cookies() method that takes cookieName as parameter in a local variable.
+Check the availability of token stored as if there is no cookie stored in the value it means user hadn't been logged in and we just have to proceed to next step by next() call.
+Now are getting token value we also have to validate it for security hence we use "validateToken" method we created in auth.js and also we know it will throw an error in case of wrong password so have to use try and catch where try will hold the operation of validation by storing the "validateToken" method (that takes jwt token as parameter) output into a local variable and after this we will swap the current user body with local variable body by using "req.user=local variable" operation  where as catch will not do anything.
+In the next line just declare next() call.
+-> Install cookie parser middleware dependency and intantiate the method cookieParser() from its package and use declare this middleware in index.js file also declare "checkForAuthenticationCookie" middleware along with it.
+-> Locate to nav.ejs and use if-else condition to show User name and add blog feature only when user is logged-in otherwise Sign in button will appear.
+
+Create a route "/logout" in routes/user.js that will clear the token cookie and redirect the user to home page use "res.clearCookie" method that takes validate cookie token name as parameter and then call .redirect("/").
+-> We will add the logout functionality in drop down feature near the user name.
+
+Create a blog.js file in models folder.
+-> import Schema and models methods from mongoose package
+-> create the schema for blogs creation using Schema method and store it in the local variable.
+-> The schema will hold keys: title(String,true), body(String,true), coverImage(String,false), createdBy(Schema.Types.ObjectId,ref) also create timestamps
+-> Create a model for blogs based on defined schema using models() method that takes name of database to use and schema as parameters. 
+
+Create addBlog.ejs page in views folder.
+-> Will have same navigation bar.
+-> Create a form component for addBlog page that have action on request /add-Blog and method will be post and also enctype as "multipart/form-date" as we use multer package.
+-> create different form fields : title, body, input files and submit button in the page
+-> Create a blog.js file at routes folder then create a express router in it.
+-> create a get route in blog.js on path "/add-new" and in return render addBlog.ejs with user:req.user parameter.
+-> create object of routes/blog.js in index.js file and make its router against requests on route "/blog/"
+-> Install multer, path dependency and instantiate their objects using there package in routes/blog.js file.
+-> Create a upload folder inside public folder that will store all the uploaded images received from user's.
+-> We will use multer diskStorage management for which we create a object that store output of method multer.diskStorage(). The method will take an object parameter in which two things will be required destination and filename. The destination key take function with "req,res,cb" parameters and inside it cb(callback) function will be passed with null and file storing path using path.resolve() as parameters. The filename key also take function with "req,res,cb" parameters and inside it first we create a suffix for the file that will contain the storing timing then we use cb() method with null and we submit file with suffix name using "file.filename + '-' + suffix" operation.
+-> create a variable that takes output of multer({}) function that have a parameter which have destination and file properties and then we will use this variable in route.post() method as a middleware.
+-> Create a post route on route/blog.js that has parameters "/", upload.single("coverImage") a middleware, (req,res) as call back function parameters and inside call back function create local bodies for title and body property using req.body. Create a local variable that store output of properties of newly created blog using Blog.create({body,title,createBy:req.user.id,coverImageURL:'/uploads/${req.file.filename}'}) and the in return redirect user on route "/blog/${blog.id}"
+
+Make changes in the index.js file
+-> Create an object for Blog model 
+-> In get route of index.js file create a local variable that store output of Blog.find({}) method which is entries of each and every blog stored in the database and render home.ejs file with object having properties as user:req.user and blogs:local variable
+
+Make changes in the home.ejs file
+-> use bootstrap component to make card object on web page
+-> create a for each loop to render every blog available in the db as like "blogs.forEach(blog=>{})"
+-> change the locating actions and name of components to target the required data like title: blog.title, image:blog.coverImage
+-> create express.static(path.resolve('./public')) middleware in index.js file so that express will treat the content of public folder in static format.
+
+Part-3
+Create a blog.ejs file in views folder and copy the general components.
+-> Create a get route in blog.js router  that take parameter for path as "/:id" and (req,res) with anonymous function, in anonymous function create a local variable that stores output of method "await Blog.find(req.params._id)" which is typically related to the data of object whose id has been specified in search paramete, in return render the blog.ejs file with an object parameter as "user:req.paramas._id, local variable"
+-> Design the blog.ejs file according to your need using css and use blogs properties like title, body, createdBy, image etc., to show information about blogs;
+-> Use "pre" tag in place of paragraph to show body content of blog in same appearence as it has been saved.

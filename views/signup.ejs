@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head.ejs') %>
+    <title>Sign Up</title>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+    <style>
+        body {
+          background-color: #212121;
+          font-family: 'Roboto', sans-serif;
+          color: white;
+        }
+        .container {
+          background-color: #424242;
+          padding: 20px;
+          border-radius: 10px;
+          max-width: 800px;
+          margin: auto;
+        }
+        h1 {
+          text-align: center;
+        }
+        .form-label {
+          color: white;
+        }
+        .form-container {
+          margin: auto;
+          width: 50%;
+        }
+        /* Responsive styles */
+        @media (max-width: 576px) {
+          .form-container {
+            width: 90%;
+          }
+        }
+        @media (min-width: 577px) and (max-width: 768px) {
+          .form-container {
+            width: 80%;
+          }
+        }
+        @media (min-width: 769px) {
+          .form-container {
+            width: 70%;
+          }
+        }
+      </style>
+    <form action="/user/signup" method="POST">
+        <div class="mb-3 mt-5" style="margin-left: 30%;width: 50%;">
+            <label for="fullName" class="fullName">Full Name</label>
+            <input type="text" class="form-control" id="fullName" name="fullName" required>
+        </div>
+        <div class="mb-3" style="margin-left: 30%;width: 50%;">
+            <label for="exampleInputEmail1" class="email">Email address</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" required>
+        </div>
+        <div class="mb-3" style="margin-left: 30%;width: 50%;">
+            <label for="exampleInputPassword1" class="password">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-left: 50%; align-self: center;">Submit</button>
+      </form>
+    <%- include('./partials/script.ejs') %>
+</body>
+</html>

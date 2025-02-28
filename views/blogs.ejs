@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/head.ejs') %>
+    <title>Blogify-Blogs</title>
+  </head>
+  <style>
+    body{
+      background-color: #212121;
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      /* align-items: center; */
+      flex-direction: column;
+    }
+    #main{
+      background-color: #fff;
+      padding: 20px;
+      color: black;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .userDetails{
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      width: 100%;
+    }
+    #main h1{
+      text-align: center;
+    }
+   
+    .content {
+      margin-top: 2rem;
+      white-space: pre-wrap; /* Preserve whitespace but allow wrapping */
+      word-wrap: break-word; /* Break long words */
+      font-size: large;
+      font-weight: 500;
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      border: solid 3px black;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    #commentContainer{
+      background-color: #fff;
+      padding: 20px;
+      color: black;
+      border-radius: 10px;
+      /* display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column; */
+    }
+    img {
+      border-radius: 10px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 576px) {
+      #main, #commentContainer {
+        padding: 10px;
+      }
+      .content {
+        font-size: medium;
+      }
+      .userDetails img {
+        width: 30px;
+      }
+    }
+    @media (min-width: 577px) and (max-width: 768px) {
+      #main, #commentContainer {
+        padding: 15px;
+      }
+      .content {
+        font-size: large;
+      }
+      .userDetails img {
+        width: 40px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      #main, #commentContainer {
+        padding: 20px;
+      }
+      .content {
+        font-size: large;
+      }
+      .userDetails img {
+        width: 50px;
+      }
+    }
+  </style>
+  <body>
+    <%- include('./partials/nav') %>
+    <div id="main" class="container mt-3">
+        <h1><%= blog.title%></h1>
+        <div class="userDetails"><p>Created by: <img src="/defaultProfile.jpg" width="50px"  alt="Profile Image"><%= blog.createdBy.fullName %> (Id: <%= blog.createdBy.id %>)</p></div>
+        <img src="<%=blog.coverImage%>" width="1000px" height="500px" alt="..." />
+        <pre class="content"><%= blog.body %></pre>
+    </div>
+
+    <div id="commentContainer" class="container mt-3">
+      <h1>Comments (<%= comment.length%>)</h1>
+      <% if(locals.user){%>
+      <form action="/blog/comment/<%= blog._id %>" method="POST">
+        <div class="mb-3"></div>
+        <input type="text" name="content" class="form-control" placeholder="Enter your comment here" required>
+        <button type="submit" class="btn btn-primary mt-3" style="margin-left: 50%; align-self: center;">Submit</button>
+      </form>
+      <% } %>
+    </div>
+
+    <div class="mt-3">
+      <% comment.forEach(comment =>{%>
+        <div class="container mt-3" id="commentContainer">
+            <div class="userDetails"><p>Comment by: <img src="/defaultProfile.jpg" width="50px"  alt="Profile Image"><%= comment.createdBy.fullName %> at: <%= new Date(comment.createdAt).toLocaleString('en-UK', { timeZoneName: 'short' }).replace(/ GMT.*$/, '') %></p></div>
+          <pre class="content"><%= comment.content %></pre>
+        </div>
+          
+        </div>
+      <% }) %>
+      
+    </div>
+    <%- include('./partials/script.ejs') %>
+  </body>
+</html>
